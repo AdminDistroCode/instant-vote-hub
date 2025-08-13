@@ -205,8 +205,8 @@ const MyPolls = () => {
 
           {/* Filters and Search */}
           <Card className="mb-8">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:gap-4">
                 <div className="flex-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
@@ -219,9 +219,9 @@ const MyPolls = () => {
                   </div>
                 </div>
                 
-                <div className="flex gap-4">
+                <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:gap-4">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-32">
+                    <SelectTrigger className="w-full sm:w-32">
                       <Filter className="w-4 h-4 mr-2" />
                       <SelectValue />
                     </SelectTrigger>
@@ -233,7 +233,7 @@ const MyPolls = () => {
                   </Select>
 
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full sm:w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -249,12 +249,12 @@ const MyPolls = () => {
           </Card>
 
           {/* Results Summary */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6">
             <p className="text-sm text-muted-foreground">
               Showing {filteredPolls.length} of {polls.length} polls
             </p>
             <Link to="/create">
-              <Button variant="poll">
+              <Button variant="poll" className="w-full sm:w-auto">
                 <Vote className="w-4 h-4 mr-2" />
                 Create New Poll
               </Button>
@@ -263,7 +263,7 @@ const MyPolls = () => {
 
           {/* Polls Grid */}
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <Card key={i} className="animate-pulse">
                   <CardContent className="p-6">
@@ -275,7 +275,7 @@ const MyPolls = () => {
               ))}
             </div>
           ) : filteredPolls.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredPolls.map((poll) => (
                 <div key={poll.id} className="relative">
                   <PollCard 
@@ -286,18 +286,22 @@ const MyPolls = () => {
                     isActive={poll.is_active}
                     createdAt={poll.created_at}
                     options={poll.poll_options.map(opt => opt.option_text)}
+                    hideStatus={true} // Hide the default status badge
                   />
                   
                   {/* Poll Management Controls */}
-                  <div className="absolute top-2 right-2 flex flex-col gap-2">
-                    <Badge variant={poll.is_active ? "default" : "secondary"} className="text-xs">
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                    <Badge 
+                      variant={poll.is_active ? "default" : "secondary"} 
+                      className="text-xs px-2 py-1 shadow-sm bg-background/90 backdrop-blur"
+                    >
                       {poll.is_active ? "Active" : "Closed"}
                     </Badge>
                     <Button
                       size="sm"
                       variant={poll.is_active ? "destructive" : "default"}
                       onClick={() => togglePollStatus(poll.id, poll.is_active)}
-                      className="h-8 px-3 text-xs"
+                      className="h-8 px-3 text-xs shadow-sm bg-background/90 backdrop-blur border"
                       title={poll.is_active ? "Close Poll" : "Reopen Poll"}
                     >
                       {poll.is_active ? (

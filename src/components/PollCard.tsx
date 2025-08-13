@@ -12,9 +12,10 @@ interface PollCardProps {
   isActive: boolean
   createdAt: string
   options: string[]
+  hideStatus?: boolean // New prop to hide status badge
 }
 
-export const PollCard = ({ id, title, description, totalVotes, isActive, createdAt, options }: PollCardProps) => {
+export const PollCard = ({ id, title, description, totalVotes, isActive, createdAt, options, hideStatus = false }: PollCardProps) => {
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur">
       <CardHeader className="pb-3">
@@ -27,13 +28,15 @@ export const PollCard = ({ id, title, description, totalVotes, isActive, created
               <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
             )}
           </div>
-          <Badge variant={isActive ? "default" : "secondary"} className="ml-2">
-            {isActive ? (
-              <><CheckCircle className="w-3 h-3 mr-1" /> Active</>
-            ) : (
-              "Closed"
-            )}
-          </Badge>
+          {!hideStatus && (
+            <Badge variant={isActive ? "default" : "secondary"} className="ml-2 shrink-0">
+              {isActive ? (
+                <><CheckCircle className="w-3 h-3 mr-1" /> Active</>
+              ) : (
+                "Closed"
+              )}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       

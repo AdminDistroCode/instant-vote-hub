@@ -46,31 +46,31 @@ export const Navigation = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           <Vote className="w-6 h-6 text-primary" />
-          FlashPoll
+          <span className="hidden sm:inline">FlashPoll</span>
         </Link>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {user ? (
             <>
-              <Link to="/my-polls">
+              <Link to="/my-polls" className="hidden sm:block">
                 <Button variant="outline" size="sm">
                   <List className="w-4 h-4" />
-                  My Polls
+                  <span className="hidden md:inline ml-2">My Polls</span>
                 </Button>
               </Link>
               <Link to="/create">
                 <Button variant="poll" size="sm">
                   <Plus className="w-4 h-4" />
-                  Create Poll
+                  <span className="hidden md:inline ml-2">Create Poll</span>
                 </Button>
               </Link>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
                 <User className="w-4 h-4" />
-                {user.email}
+                <span className="max-w-32 truncate">{user.email}</span>
               </div>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                <span className="hidden sm:inline ml-2">Sign Out</span>
               </Button>
             </>
           ) : (
@@ -78,7 +78,7 @@ export const Navigation = () => {
               <Link to="/create">
                 <Button variant="poll" size="sm">
                   <Plus className="w-4 h-4" />
-                  Create Poll
+                  <span className="hidden sm:inline ml-2">Create Poll</span>
                 </Button>
               </Link>
               <Link to="/login">
