@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import PollPage from "./pages/PollPage";
 import CreatePoll from "./pages/CreatePoll";
 import AllPolls from "./pages/AllPolls";
+import MyPolls from "./pages/MyPolls";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/polls" element={<AllPolls />} />
+            <Route path="/my-polls" element={<MyPolls />} />
             <Route path="/poll/:id" element={<PollPage />} />
             <Route path="/create" element={<CreatePoll />} />
             <Route path="/login" element={<Login />} />

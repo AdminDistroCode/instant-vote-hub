@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Plus, Vote, LogOut, User } from "lucide-react"
+import { Plus, Vote, LogOut, User, List } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useToast } from "@/hooks/use-toast"
@@ -52,6 +52,12 @@ export const Navigation = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <>
+              <Link to="/my-polls">
+                <Button variant="outline" size="sm">
+                  <List className="w-4 h-4" />
+                  My Polls
+                </Button>
+              </Link>
               <Link to="/create">
                 <Button variant="poll" size="sm">
                   <Plus className="w-4 h-4" />
