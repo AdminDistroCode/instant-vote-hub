@@ -289,20 +289,27 @@ const MyPolls = () => {
                   />
                   
                   {/* Poll Management Controls */}
-                  <div className="absolute top-2 right-2 flex gap-2">
+                  <div className="absolute top-2 right-2 flex flex-col gap-2">
                     <Badge variant={poll.is_active ? "default" : "secondary"} className="text-xs">
                       {poll.is_active ? "Active" : "Closed"}
                     </Badge>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant={poll.is_active ? "destructive" : "default"}
                       onClick={() => togglePollStatus(poll.id, poll.is_active)}
-                      className="h-6 w-6 p-0"
+                      className="h-8 px-3 text-xs"
+                      title={poll.is_active ? "Close Poll" : "Reopen Poll"}
                     >
                       {poll.is_active ? (
-                        <X className="w-3 h-3" />
+                        <>
+                          <X className="w-3 h-3 mr-1" />
+                          Close
+                        </>
                       ) : (
-                        <CheckCircle className="w-3 h-3" />
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Reopen
+                        </>
                       )}
                     </Button>
                   </div>
