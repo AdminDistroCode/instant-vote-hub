@@ -122,10 +122,10 @@ const PollPage = () => {
   }
 
   const handleVote = async (optionId: string) => {
-    if (!id || (!user && !getVoterIP())) {
+    if (!id || !user) {
       toast({
-        title: "Unable to vote",
-        description: "Please try again.",
+        title: "Authentication required",
+        description: "Please log in to vote on polls.",
         variant: "destructive"
       })
       return
@@ -134,20 +134,13 @@ const PollPage = () => {
     setVotingLoading(true)
     
     try {
-      const voteData: any = {
-        poll_id: id,
-        poll_option_id: optionId,
-      }
-
-      if (user) {
-        voteData.user_id = user.id
-      } else {
-        voteData.voter_ip = getVoterIP()
-      }
-
       const { error } = await supabase
         .from('votes')
-        .insert(voteData)
+        .insert({
+          poll_id: id,
+          poll_option_id: optionId,
+          user_id: user.id
+        })
 
       if (error) {
         throw error

@@ -138,105 +138,151 @@ const CreatePoll = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Link to="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold">Create New Poll</h1>
-              <p className="text-muted-foreground">Design your poll and get instant feedback</p>
+          {!user ? (
+            // Show authentication prompt for guest users
+            <div className="text-center space-y-8">
+              <div className="flex items-center gap-4 mb-8">
+                <Link to="/">
+                  <Button variant="ghost" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                </Link>
+                <div>
+                  <h1 className="text-3xl font-bold">Create New Poll</h1>
+                  <p className="text-muted-foreground">Design your poll and get instant feedback</p>
+                </div>
+              </div>
+
+              <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+                <CardContent className="p-12 text-center space-y-6">
+                  <Vote className="w-16 h-16 mx-auto text-primary" />
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-4">Account Required</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                      Creating polls requires a free account. Sign up to start creating engaging polls and managing your content.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link to="/login">
+                      <Button variant="poll" size="lg" className="w-full sm:w-auto">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Sign Up & Create Poll
+                      </Button>
+                    </Link>
+                    <Link to="/login">
+                      <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                        Already have an account? Login
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Vote className="w-5 h-5 text-primary" />
-                Poll Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Poll Title *</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., What's your favorite programming language?"
-                    value={poll.title}
-                    onChange={(e) => setPoll(prev => ({ ...prev, title: e.target.value }))}
-                    className="text-lg"
-                  />
+          ) : (
+            // Show poll creation form for authenticated users
+            <>
+              <div className="flex items-center gap-4 mb-8">
+                <Link to="/">
+                  <Button variant="ghost" size="sm">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                </Link>
+                <div>
+                  <h1 className="text-3xl font-bold">Create New Poll</h1>
+                  <p className="text-muted-foreground">Design your poll and get instant feedback</p>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description (optional)</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Add more context about your poll..."
-                    value={poll.description}
-                    onChange={(e) => setPoll(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <Label>Poll Options *</Label>
-                  {poll.options.map((option, index) => (
-                    <div key={index} className="flex gap-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Vote className="w-5 h-5 text-primary" />
+                    Poll Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Poll Title *</Label>
                       <Input
-                        placeholder={`Option ${index + 1}`}
-                        value={option}
-                        onChange={(e) => updateOption(index, e.target.value)}
-                        className="flex-1"
+                        id="title"
+                        placeholder="e.g., What's your favorite programming language?"
+                        value={poll.title}
+                        onChange={(e) => setPoll(prev => ({ ...prev, title: e.target.value }))}
+                        className="text-lg"
                       />
-                      {poll.options.length > 2 && (
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description (optional)</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Add more context about your poll..."
+                        value={poll.description}
+                        onChange={(e) => setPoll(prev => ({ ...prev, description: e.target.value }))}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="space-y-4">
+                      <Label>Poll Options *</Label>
+                      {poll.options.map((option, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            placeholder={`Option ${index + 1}`}
+                            value={option}
+                            onChange={(e) => updateOption(index, e.target.value)}
+                            className="flex-1"
+                          />
+                          {poll.options.length > 2 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => removeOption(index)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {poll.options.length < 10 && (
                         <Button
                           type="button"
                           variant="outline"
-                          size="icon"
-                          onClick={() => removeOption(index)}
+                          onClick={addOption}
+                          className="w-full"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Option
                         </Button>
                       )}
                     </div>
-                  ))}
-                  
-                  {poll.options.length < 10 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addOption}
-                      className="w-full"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Option
-                    </Button>
-                  )}
-                </div>
 
-                <div className="flex gap-4 pt-4">
-                  <Button
-                    type="submit"
-                    variant="poll"
-                    size="lg"
-                    disabled={isLoading}
-                    className="flex-1"
-                  >
-                    {isLoading ? "Creating..." : "Create Poll"}
-                  </Button>
-                  <Link to="/">
-                    <Button variant="outline" size="lg">
-                      Cancel
-                    </Button>
-                  </Link>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+                    <div className="flex gap-4 pt-4">
+                      <Button
+                        type="submit"
+                        variant="poll"
+                        size="lg"
+                        disabled={isLoading}
+                        className="flex-1"
+                      >
+                        {isLoading ? "Creating..." : "Create Poll"}
+                      </Button>
+                      <Link to="/">
+                        <Button variant="outline" size="lg">
+                          Cancel
+                        </Button>
+                      </Link>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
       </div>
     </div>
