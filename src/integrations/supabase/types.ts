@@ -150,7 +150,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_poll_total_votes: {
+        Args: { poll_id_param: string }
+        Returns: number
+      }
+      get_poll_vote_counts: {
+        Args: { poll_id_param: string }
+        Returns: {
+          option_id: string
+          option_text: string
+          vote_count: number
+          option_order: number
+        }[]
+      }
+      has_user_voted: {
+        Args: { poll_id_param: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

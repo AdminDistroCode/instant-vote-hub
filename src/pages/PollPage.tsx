@@ -48,6 +48,7 @@ const PollPage = () => {
     
     setIsLoading(true)
     try {
+      // Fetch basic poll data
       const { data: pollData, error: pollError } = await supabase
         .from('polls')
         .select('*')
@@ -58,30 +59,21 @@ const PollPage = () => {
         throw pollError
       }
 
-      const { data: optionsData, error: optionsError } = await supabase
-        .from('poll_options')
-        .select('*')
-        .eq('poll_id', id)
-        .order('option_order')
+      // Use secure function to get vote counts without exposing individual votes
+      const { data: voteCountsData, error: voteCountsError } = await supabase
+        .rpc('get_poll_vote_counts', { poll_id_param: id })
 
-      if (optionsError) {
-        throw optionsError
+      if (voteCountsError) {
+        throw voteCountsError
       }
 
-      // Get vote counts for each option
-      const optionsWithVotes = await Promise.all(
-        optionsData.map(async (option) => {
-          const { count } = await supabase
-            .from('votes')
-            .select('*', { count: 'exact' })
-            .eq('poll_option_id', option.id)
-
-          return {
-            ...option,
-            votes: count || 0
-          }
-        })
-      )
+      // Transform the data to match our component structure
+      const optionsWithVotes = voteCountsData.map((item: any) => ({
+        id: item.option_id,
+        option_text: item.option_text,
+        option_order: item.option_order,
+        votes: Number(item.vote_count)
+      }))
 
       setPoll({
         ...pollData,
@@ -103,14 +95,11 @@ const PollPage = () => {
     if (!id || !user) return
 
     try {
+      // Use secure function to check if user has voted
       const { data, error } = await supabase
-        .from('votes')
-        .select('*')
-        .eq('poll_id', id)
-        .eq('user_id', user.id)
-        .maybeSingle()
+        .rpc('has_user_voted', { poll_id_param: id })
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error checking vote:', error)
         return
       }

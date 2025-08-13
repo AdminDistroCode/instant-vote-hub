@@ -35,12 +35,12 @@ const Home = () => {
 
   const fetchPolls = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch polls with basic info only (no vote details)
+      const { data: pollsData, error } = await supabase
         .from('polls')
         .select(`
           *,
-          poll_options(option_text),
-          votes(id)
+          poll_options(option_text)
         `)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
@@ -54,7 +54,28 @@ const Home = () => {
           variant: "destructive"
         })
       } else {
-        setPolls(data || [])
+        // Get vote counts securely for each poll
+        const pollsWithCounts = await Promise.all(
+          (pollsData || []).map(async (poll) => {
+            try {
+              const { data: totalVotes } = await supabase
+                .rpc('get_poll_total_votes', { poll_id_param: poll.id })
+              
+              return {
+                ...poll,
+                votes: Array(totalVotes || 0).fill({ id: 'placeholder' })
+              }
+            } catch (error) {
+              console.error('Error fetching vote count for poll:', poll.id, error)
+              return {
+                ...poll,
+                votes: []
+              }
+            }
+          })
+        )
+        
+        setPolls(pollsWithCounts)
       }
     } catch (error) {
       console.error('Error:', error)
