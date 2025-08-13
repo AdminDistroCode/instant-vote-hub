@@ -8,10 +8,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Plus, Trash2, Vote, ArrowLeft } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
+import { supabase } from "@/integrations/supabase/client"
+import { useAuth } from "@/hooks/useAuth"
 
 const CreatePoll = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [poll, setPoll] = useState({
     title: "",
@@ -47,6 +50,16 @@ const CreatePoll = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to create a poll.",
+        variant: "destructive"
+      })
+      navigate('/login')
+      return
+    }
+    
     if (!poll.title.trim()) {
       toast({
         title: "Title required",
@@ -68,14 +81,55 @@ const CreatePoll = () => {
 
     setIsLoading(true)
     
-    // Simulate API call - will be replaced with Supabase
-    setTimeout(() => {
+    try {
+      // Create the poll
+      const { data: pollData, error: pollError } = await supabase
+        .from('polls')
+        .insert({
+          title: poll.title.trim(),
+          description: poll.description.trim() || null,
+          user_id: user.id,
+          is_active: true
+        })
+        .select()
+        .single()
+
+      if (pollError) {
+        throw pollError
+      }
+
+      // Create poll options
+      const optionsData = validOptions.map((option, index) => ({
+        poll_id: pollData.id,
+        option_text: option.trim(),
+        option_order: index
+      }))
+
+      const { error: optionsError } = await supabase
+        .from('poll_options')
+        .insert(optionsData)
+
+      if (optionsError) {
+        throw optionsError
+      }
+
       toast({
         title: "Poll created!",
         description: "Your poll has been created successfully.",
       })
-      navigate("/poll/new-poll-id")
-    }, 1000)
+      
+      navigate(`/poll/${pollData.id}`)
+      
+    } catch (error: any) {
+      console.error('Error creating poll:', error)
+      toast({
+        title: "Error creating poll",
+        description: error.message || "Failed to create poll. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (

@@ -8,52 +8,173 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Share2, ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
+import { supabase } from "@/integrations/supabase/client"
+import { useAuth } from "@/hooks/useAuth"
 
-// Mock data - will be replaced with Supabase
-const mockPoll = {
-  id: "1",
-  title: "What's your favorite programming language in 2024?",
-  description: "Help us understand the current trends in software development",
-  isActive: true,
-  options: [
-    { id: "1", text: "JavaScript", votes: 45 },
-    { id: "2", text: "Python", votes: 38 },
-    { id: "3", text: "TypeScript", votes: 32 },
-    { id: "4", text: "Go", votes: 18 },
-    { id: "5", text: "Rust", votes: 12 }
-  ]
+interface PollOption {
+  id: string
+  option_text: string
+  option_order: number
+  votes: number
+}
+
+interface Poll {
+  id: string
+  title: string
+  description: string | null
+  is_active: boolean
+  created_at: string
+  options: PollOption[]
 }
 
 const PollPage = () => {
   const { id } = useParams()
   const { toast } = useToast()
+  const { user } = useAuth()
   const [hasVoted, setHasVoted] = useState(false)
-  const [poll, setPoll] = useState(mockPoll)
+  const [poll, setPoll] = useState<Poll | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [votingLoading, setVotingLoading] = useState(false)
 
-  const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0)
+  useEffect(() => {
+    if (id) {
+      fetchPoll()
+      checkUserVoted()
+    }
+  }, [id, user])
+
+  const fetchPoll = async () => {
+    if (!id) return
+    
+    setIsLoading(true)
+    try {
+      const { data: pollData, error: pollError } = await supabase
+        .from('polls')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (pollError) {
+        throw pollError
+      }
+
+      const { data: optionsData, error: optionsError } = await supabase
+        .from('poll_options')
+        .select('*')
+        .eq('poll_id', id)
+        .order('option_order')
+
+      if (optionsError) {
+        throw optionsError
+      }
+
+      // Get vote counts for each option
+      const optionsWithVotes = await Promise.all(
+        optionsData.map(async (option) => {
+          const { count } = await supabase
+            .from('votes')
+            .select('*', { count: 'exact' })
+            .eq('poll_option_id', option.id)
+
+          return {
+            ...option,
+            votes: count || 0
+          }
+        })
+      )
+
+      setPoll({
+        ...pollData,
+        options: optionsWithVotes
+      })
+    } catch (error: any) {
+      console.error('Error fetching poll:', error)
+      toast({
+        title: "Error loading poll",
+        description: "Failed to load poll data.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const checkUserVoted = async () => {
+    if (!id || !user) return
+
+    try {
+      const { data, error } = await supabase
+        .from('votes')
+        .select('*')
+        .eq('poll_id', id)
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking vote:', error)
+        return
+      }
+
+      setHasVoted(!!data)
+    } catch (error) {
+      console.error('Error checking vote:', error)
+    }
+  }
 
   const handleVote = async (optionId: string) => {
-    setIsLoading(true)
+    if (!id || (!user && !getVoterIP())) {
+      toast({
+        title: "Unable to vote",
+        description: "Please try again.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setVotingLoading(true)
     
-    // Simulate API call
-    setTimeout(() => {
-      setPoll(prev => ({
-        ...prev,
-        options: prev.options.map(option =>
-          option.id === optionId 
-            ? { ...option, votes: option.votes + 1 }
-            : option
-        )
-      }))
+    try {
+      const voteData: any = {
+        poll_id: id,
+        poll_option_id: optionId,
+      }
+
+      if (user) {
+        voteData.user_id = user.id
+      } else {
+        voteData.voter_ip = getVoterIP()
+      }
+
+      const { error } = await supabase
+        .from('votes')
+        .insert(voteData)
+
+      if (error) {
+        throw error
+      }
+
       setHasVoted(true)
-      setIsLoading(false)
+      await fetchPoll() // Refresh poll data to show updated vote counts
       
       toast({
         title: "Vote recorded!",
         description: "Thank you for participating in this poll.",
       })
-    }, 1000)
+    } catch (error: any) {
+      console.error('Error voting:', error)
+      toast({
+        title: "Error recording vote",
+        description: error.message || "Failed to record your vote. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setVotingLoading(false)
+    }
+  }
+
+  const getVoterIP = () => {
+    // Simple IP detection - in a real app, you'd get this from the server
+    return `${Math.random().toString(36).substr(2, 9)}`
   }
 
   const handleShare = () => {
@@ -62,6 +183,18 @@ const PollPage = () => {
       title: "Link copied!",
       description: "Poll link has been copied to your clipboard.",
     })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Loading poll...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!poll) {
@@ -80,6 +213,8 @@ const PollPage = () => {
       </div>
     )
   }
+
+  const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0)
 
   return (
     <div className="min-h-screen bg-background">
@@ -105,13 +240,13 @@ const PollPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Voting Form */}
             <div className="space-y-6">
-              {!hasVoted && poll.isActive ? (
+              {!hasVoted && poll.is_active ? (
                 <VotingForm
                   title={poll.title}
                   description={poll.description}
-                  options={poll.options.map(o => ({ id: o.id, text: o.text }))}
+                  options={poll.options.map(o => ({ id: o.id, text: o.option_text }))}
                   onVote={handleVote}
-                  isLoading={isLoading}
+                  isLoading={votingLoading}
                   totalVotes={totalVotes}
                 />
               ) : (
@@ -138,9 +273,13 @@ const PollPage = () => {
             <div className="space-y-6">
               <PollResults
                 title="Live Results"
-                options={poll.options}
+                options={poll.options.map(o => ({ 
+                  id: o.id, 
+                  text: o.option_text, 
+                  votes: o.votes 
+                }))}
                 totalVotes={totalVotes}
-                isActive={poll.isActive}
+                isActive={poll.is_active}
               />
             </div>
           </div>
