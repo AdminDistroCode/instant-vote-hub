@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Home from "./pages/Home";
 import PollPage from "./pages/PollPage";
 import CreatePoll from "./pages/CreatePoll";
+import AllPolls from "./pages/AllPolls";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -21,6 +22,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/polls" element={<AllPolls />} />
             <Route path="/poll/:id" element={<PollPage />} />
             <Route path="/create" element={<CreatePoll />} />
             <Route path="/login" element={<Login />} />

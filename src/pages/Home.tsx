@@ -105,10 +105,12 @@ const Home = () => {
                 Create Your First Poll
               </Button>
             </Link>
-            <Button variant="outline" size="xl" className="min-w-48" onClick={fetchPolls}>
-              <TrendingUp className="w-5 h-5" />
-              Explore Polls
-            </Button>
+            <Link to="/polls">
+              <Button variant="outline" size="xl" className="min-w-48">
+                <TrendingUp className="w-5 h-5" />
+                Explore Polls
+              </Button>
+            </Link>
           </div>
           
           {/* Real Stats */}
@@ -170,7 +172,9 @@ const Home = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold">Featured Polls</h2>
-            <Button variant="outline" onClick={fetchPolls}>View All</Button>
+            <Link to="/polls">
+              <Button variant="outline">View All</Button>
+            </Link>
           </div>
           
           {loading ? (
