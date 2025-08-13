@@ -69,7 +69,7 @@ export const Navigation = () => {
             </>
           ) : (
             <>
-              <Link to="/login">
+              <Link to="/create">
                 <Button variant="poll" size="sm">
                   <Plus className="w-4 h-4" />
                   Create Poll
