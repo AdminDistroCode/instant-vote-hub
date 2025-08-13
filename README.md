@@ -3,7 +3,7 @@
 ## Overview
 FlashPoll is a modern, responsive web application that enables users to create, manage, and participate in real-time polls. Built with React and Supabase, it provides a seamless polling experience with instant vote tracking and user authentication.
 
-**Live Demo**: [https://lovable.dev/projects/0853b0d7-1bd5-4527-98ba-07490c14da57](https://lovable.dev/projects/0853b0d7-1bd5-4527-98ba-07490c14da57)
+**Live Demo**: [https://instant-vote-hub.lovable.app/]
 
 ---
 
@@ -56,8 +56,8 @@ FlashPoll is a modern, responsive web application that enables users to create, 
 
 1. **Clone the repository**
    ```bash
-   git clone <YOUR_GIT_URL>
-   cd <YOUR_PROJECT_NAME>
+   git clone https://github.com/AdminDistroCode/instant-vote-hub.git
+   cd instant-vote-hub
    ```
 
 2. **Install dependencies**
