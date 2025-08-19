@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -110,7 +110,6 @@ export type Database = {
           poll_id: string
           poll_option_id: string
           user_id: string | null
-          voter_ip: string | null
         }
         Insert: {
           created_at?: string
@@ -118,7 +117,6 @@ export type Database = {
           poll_id: string
           poll_option_id: string
           user_id?: string | null
-          voter_ip?: string | null
         }
         Update: {
           created_at?: string
@@ -126,7 +124,6 @@ export type Database = {
           poll_id?: string
           poll_option_id?: string
           user_id?: string | null
-          voter_ip?: string | null
         }
         Relationships: [
           {
@@ -158,9 +155,9 @@ export type Database = {
         Args: { poll_id_param: string }
         Returns: {
           option_id: string
+          option_order: number
           option_text: string
           vote_count: number
-          option_order: number
         }[]
       }
       has_user_voted: {
