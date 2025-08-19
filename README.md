@@ -140,6 +140,11 @@ src/
 - **Row Level Security (RLS)** - Users can only manage their own polls
 - **Secure APIs** - All database queries use Supabase's secure client
 - **Input Validation** - Form validation with Zod schemas
+- **Privacy Protection** - Voter IP addresses are not stored to protect anonymity
+
+### Recent Security Improvements
+- **v1.0.1**: Removed voter IP address storage to prevent potential harvesting by poll owners
+- **Privacy by Design**: Vote tracking focuses only on necessary data (user ID, poll choice)
 
 ---
 
