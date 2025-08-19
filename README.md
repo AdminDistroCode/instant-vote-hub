@@ -51,6 +51,7 @@ FlashPoll is a modern, responsive web application that enables users to create, 
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn package manager
+- Supabase account (for local development)
 
 ### Installation
 
@@ -65,12 +66,26 @@ FlashPoll is a modern, responsive web application that enables users to create, 
    npm install
    ```
 
-3. **Start development server**
+3. **Environment Setup**
+   
+   The project includes a `.env` file with the Supabase configuration. For local development, you can:
+   
+   - **Use existing config**: The current `.env` file works out of the box
+   - **Use your own Supabase project**: Replace the values in `.env` with your own:
+   
+   ```bash
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+   
+   See `.env.example` for the required environment variables.
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+5. **Open your browser**
    Navigate to `http://localhost:5173`
 
 ---
